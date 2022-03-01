@@ -1,6 +1,13 @@
 package com.mabnets.jslradio.Views
 
+import android.app.Activity
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.ColorFilter
+import android.os.IBinder
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
@@ -11,6 +18,7 @@ import com.mabnets.jslradio.R
 import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -31,10 +39,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.platform.LocalContext
+import com.beraldo.playerlib.PlayerService
 
 @Composable()
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavController)  {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -66,7 +77,7 @@ fun MainScreen(navController: NavController) {
                     .weight(10f)
             )
             Spacer(modifier = Modifier.height(30.dp))
-            SongDescription("Audio Name", "State Diagram – Maintain Payment Plans")
+            SongDescription("JESUS IS LORD RADIO", "streaming live")
             Spacer(modifier = Modifier.height(35.dp))
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,7 +98,7 @@ fun TopAppBar(navController: NavController) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = {navController.navigate("Login_page")  }) {
+        IconButton(onClick = {navController.navigateUp()  }) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back Icon",
@@ -144,6 +155,37 @@ fun PlayerButtons(
     playerButtonSize: Dp = 72.dp,
     sideButtonSize: Dp = 42.dp
 ) {
+    val audioFlag = remember { mutableStateOf(true) }
+    val urls="https://s3.radio.co/s97f38db97/listen"
+    val contexts = LocalContext.current
+    val connection = object : ServiceConnection {
+        override fun onServiceDisconnected(name: ComponentName?) {}
+
+        /*
+     * Called after a successful bind with our PlayerService.
+     */
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+
+            if (service is PlayerService.PlayerServiceBinder) {
+                //service.getPlayerHolderInstance() // use the player and call methods on it to start and stop
+                if (audioFlag.value) {
+                    Toast.makeText(contexts, "Playing..", Toast.LENGTH_LONG).show()
+                    service.getPlayerHolderInstance().start()
+                } else {
+                    service.getPlayerHolderInstance().stop()
+                    Toast.makeText(contexts, "Pausing..", Toast.LENGTH_LONG).show()
+                }
+
+            }
+            else {
+                audioFlag.value = true
+            }
+        }
+    }
+    val intent = Intent(contexts, PlayerService::class.java).apply {
+        putExtra(PlayerService.STREAM_URL, urls)
+    }
+    (contexts as Activity).applicationContext!!.bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -156,6 +198,13 @@ fun PlayerButtons(
         val midlebtnModifier = Modifier
             .size(playerButtonSize)
             .semantics { role = Role.Button }
+            .clickable {
+                if (audioFlag.value) {
+                    audioFlag.value = false
+                } else {
+                    audioFlag.value = true
+                }
+            }
 
         Icon(
             painter = painterResource(R.drawable.ic_baseline_skip_next_24),
@@ -164,12 +213,18 @@ fun PlayerButtons(
             tint = Color.White
         )
 
+
         Icon(
-            painter = painterResource(R.drawable.ic_baseline_play_arrow_24),
+            painter = if (audioFlag.value) {
+                painterResource(R.drawable.ic_baseline_pause_24)
+            } else {
+                painterResource(R.drawable.ic_baseline_play_arrow_24)
+            },
             contentDescription = "Play / Pause Icon",
             tint = Color.White,
             modifier = midlebtnModifier,
         )
+
 
         Icon(
             painter = painterResource(R.drawable.ic_baseline_skip_previous_24),
@@ -177,6 +232,8 @@ fun PlayerButtons(
             modifier = buttonModifier,
             tint = Color.White
         )
+
+
 
     }
 }

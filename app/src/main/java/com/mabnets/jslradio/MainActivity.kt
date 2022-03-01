@@ -1,6 +1,7 @@
 package com.mabnets.jslradio
 
 import android.os.Bundle
+import org.jetbrains.anko.AnkoLogger
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
@@ -15,7 +16,7 @@ import com.mabnets.jslradio.Views.Launcher
 import com.mabnets.jslradio.Views.MainScreen
 import com.mabnets.jslradio.ui.theme.JesusisLORDTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(),AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
