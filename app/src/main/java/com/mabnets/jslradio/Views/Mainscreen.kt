@@ -8,7 +8,7 @@ import android.content.ServiceConnection
 import android.graphics.ColorFilter
 import android.os.IBinder
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
@@ -17,8 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mabnets.jslradio.R
 import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -43,12 +43,24 @@ import androidx.compose.ui.platform.LocalContext
 import com.beraldo.playerlib.PlayerService
 
 @Composable()
-fun MainScreen(navController: NavController)  {
+fun MainScreen(navController: NavController) {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
+    val scrollState = rememberScrollState()
+
+    BoxWithConstraints {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .border(2.dp, Color.Green)
+                .verticalScroll(scrollState)
+        ) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            // fillMaxWidth instead of fillMaxSize
+            .fillMaxWidth()
+            // explicit height modifier
+            .height(this@BoxWithConstraints.maxHeight)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -86,9 +98,14 @@ fun MainScreen(navController: NavController)  {
                 Spacer(modifier = Modifier.height(40.dp))
                 PlayerButtons(modifier = Modifier.padding(vertical = 8.dp))
             }
+            Spacer(modifier = Modifier.height(20.dp))
+            Otherbtns(navController)
             Spacer(modifier = Modifier.weight(1f))
         }
     }
+
+}
+}
 }
 
 
@@ -188,14 +205,14 @@ fun PlayerButtons(
     (contexts as Activity).applicationContext!!.bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        val buttonModifier = Modifier
+        val buttonModifier = modifier
             .size(sideButtonSize)
             .semantics { role = Role.Button }
-        val midlebtnModifier = Modifier
+        val midlebtnModifier = modifier
             .size(playerButtonSize)
             .semantics { role = Role.Button }
             .clickable {
@@ -232,8 +249,47 @@ fun PlayerButtons(
             modifier = buttonModifier,
             tint = Color.White
         )
+        
 
+    }
 
+}
+@Composable
+fun Otherbtns(navController: NavController) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+    Button(onClick = { /*TODO*/ },
+        shape= RoundedCornerShape(10.dp),
+        elevation = ButtonDefaults.elevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 8.dp,
+            disabledElevation = 0.dp
+        ),
+        modifier = Modifier.fillMaxWidth(0.7f)
+    ) {
+        Text(
+            text = "Other radio links",
+            modifier = Modifier.padding(6.dp)
+        )
 
+    }
+    Spacer(modifier = Modifier.height(30.dp))
+    Button(onClick = { /*TODO*/ },
+        shape= RoundedCornerShape(10.dp),
+        elevation = ButtonDefaults.elevation(
+            defaultElevation = 6.dp,
+            pressedElevation = 8.dp,
+            disabledElevation = 0.dp
+        ),
+        modifier = Modifier.fillMaxWidth(1f)
+    ) {
+        Text(
+            text = "24/7 Endtime-Messages",
+            modifier = Modifier.padding(6.dp)
+                  )
+
+    }
     }
 }
