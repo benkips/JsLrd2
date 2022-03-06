@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.AndroidViewModel
 import com.beraldo.playerlib.PlayerService
 
 @Composable()
@@ -47,20 +48,11 @@ fun MainScreen(navController: NavController) {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
     val scrollState = rememberScrollState()
 
-    BoxWithConstraints {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .border(2.dp, Color.Green)
-                .verticalScroll(scrollState)
-        ) {
 
     Column(
         modifier = Modifier
-            // fillMaxWidth instead of fillMaxSize
-            .fillMaxWidth()
-            // explicit height modifier
-            .height(this@BoxWithConstraints.maxHeight)
+            .scrollable(scrollState, Orientation.Vertical)
+            .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -99,15 +91,12 @@ fun MainScreen(navController: NavController) {
                 PlayerButtons(modifier = Modifier.padding(vertical = 8.dp))
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Otherbtns(navController)
+            Otherbtns(navController, musicviewmodel)
             Spacer(modifier = Modifier.weight(1f))
         }
     }
 
 }
-}
-}
-
 
 
 @Composable
@@ -115,7 +104,7 @@ fun TopAppBar(navController: NavController) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        IconButton(onClick = {navController.navigateUp()  }) {
+        IconButton(onClick = { navController.navigateUp() }) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back Icon",
@@ -165,7 +154,6 @@ fun SongDescription(
 }
 
 
-
 @Composable
 fun PlayerButtons(
     modifier: Modifier = Modifier,
@@ -173,7 +161,7 @@ fun PlayerButtons(
     sideButtonSize: Dp = 42.dp
 ) {
     val audioFlag = remember { mutableStateOf(true) }
-    val urls="https://s3.radio.co/s97f38db97/listen"
+    val urls = "https://s3.radio.co/s97f38db97/listen"
     val contexts = LocalContext.current
     val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {}
@@ -193,8 +181,7 @@ fun PlayerButtons(
                     Toast.makeText(contexts, "Pausing..", Toast.LENGTH_LONG).show()
                 }
 
-            }
-            else {
+            } else {
                 audioFlag.value = true
             }
         }
@@ -202,7 +189,11 @@ fun PlayerButtons(
     val intent = Intent(contexts, PlayerService::class.java).apply {
         putExtra(PlayerService.STREAM_URL, urls)
     }
-    (contexts as Activity).applicationContext!!.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+    (contexts as Activity).applicationContext!!.bindService(
+        intent,
+        connection,
+        Context.BIND_AUTO_CREATE
+    )
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -249,47 +240,50 @@ fun PlayerButtons(
             modifier = buttonModifier,
             tint = Color.White
         )
-        
+
 
     }
 
 }
+
 @Composable
-fun Otherbtns(navController: NavController) {
+fun Otherbtns(navController: NavController, viewModel: Mediaplayerviewmodel) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-    Button(onClick = { /*TODO*/ },
-        shape= RoundedCornerShape(10.dp),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 6.dp,
-            pressedElevation = 8.dp,
-            disabledElevation = 0.dp
-        ),
-        modifier = Modifier.fillMaxWidth(0.7f)
-    ) {
-        Text(
-            text = "Other radio links",
-            modifier = Modifier.padding(6.dp)
-        )
+        Button(
+            onClick = { /*TODO*/ },
+            shape = RoundedCornerShape(10.dp),
+            elevation = ButtonDefaults.elevation(
+                defaultElevation = 6.dp,
+                pressedElevation = 8.dp,
+                disabledElevation = 0.dp
+            ),
+            modifier = Modifier.fillMaxWidth(0.7f),
+        ) {
+            Text(
+                text = "Other radio links",
+                modifier = Modifier.padding(6.dp)
+            )
 
-    }
-    Spacer(modifier = Modifier.height(30.dp))
-    Button(onClick = { /*TODO*/ },
-        shape= RoundedCornerShape(10.dp),
-        elevation = ButtonDefaults.elevation(
-            defaultElevation = 6.dp,
-            pressedElevation = 8.dp,
-            disabledElevation = 0.dp
-        ),
-        modifier = Modifier.fillMaxWidth(1f)
-    ) {
-        Text(
-            text = "24/7 Endtime-Messages",
-            modifier = Modifier.padding(6.dp)
-                  )
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+        Button(
+            onClick = { /*TODO*/ },
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth(1f),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color.Transparent
+            ),
+        ) {
+            Text(
+                text = "24/7 Endtime-Messages",
+                color= Color.White,
+                modifier = Modifier.padding(6.dp)
 
-    }
+            )
+
+        }
     }
 }

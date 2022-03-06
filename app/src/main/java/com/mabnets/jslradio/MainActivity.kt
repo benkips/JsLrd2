@@ -1,23 +1,39 @@
 package com.mabnets.jslradio
 
 import android.os.Bundle
+import android.widget.Toast
 import org.jetbrains.anko.AnkoLogger
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mabnets.jslradio.Viewmodels.Launcherviewmodel
+import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
 import com.mabnets.jslradio.Views.Launcher
 import com.mabnets.jslradio.Views.MainScreen
 import com.mabnets.jslradio.ui.theme.JesusisLORDTheme
 
 class MainActivity : ComponentActivity(),AnkoLogger {
+    private val launcherviewmodel :Launcherviewmodel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        installSplashScreen().apply {
+            setKeepOnScreenCondition {
+                launcherviewmodel.isloading.value
+            }
+
+        }
         super.onCreate(savedInstanceState)
         setContent {
             JesusisLORDTheme {
@@ -32,9 +48,9 @@ class MainActivity : ComponentActivity(),AnkoLogger {
     private fun navigationcontroller() {
     val navcontroler = rememberNavController()
     NavHost(navController = navcontroler,
-        startDestination = "Launcher",
+        startDestination = "Mainscreen",
         builder = {
-            composable("Launcher", content = { Launcher(navController = navcontroler) })
+           // composable("Launcher", content = { Launcher(navController = navcontroler) })
             composable("Mainscreen", content = { MainScreen(navController = navcontroler) })
         }
     )
