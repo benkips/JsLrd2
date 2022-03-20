@@ -1,5 +1,6 @@
 package com.mabnets.jslradio.Views
 
+import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -31,7 +32,7 @@ fun Webviewscreen(urls:String){
              }
          }
      }, update = {
-         it.loadUrl(urls)
+         it.loadUrl("https://"+urls)
      })
     }
   }

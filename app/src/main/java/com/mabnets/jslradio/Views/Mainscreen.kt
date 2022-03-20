@@ -91,7 +91,7 @@ fun MainScreen(navController: NavController) {
                 PlayerButtons(modifier = Modifier.padding(vertical = 8.dp))
             }
             Spacer(modifier = Modifier.height(20.dp))
-            Otherbtns(navController, musicviewmodel)
+            Otherbtns(navController)
             Spacer(modifier = Modifier.weight(1f))
         }
     }
@@ -247,13 +247,14 @@ fun PlayerButtons(
 }
 
 @Composable
-fun Otherbtns(navController: NavController, viewModel: Mediaplayerviewmodel) {
+fun Otherbtns(navController: NavController) {
+    val ggle="www.google.com"
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Button(
-            onClick = { /*TODO*/ },
+            onClick = { navController.navigate("webviews/$ggle") },
             shape = RoundedCornerShape(10.dp),
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 6.dp,
