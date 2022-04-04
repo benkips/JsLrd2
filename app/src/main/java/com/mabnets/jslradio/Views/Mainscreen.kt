@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.graphics.ColorFilter
 import android.os.IBinder
 import android.widget.Toast
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.Alignment
@@ -23,6 +24,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.twotone.Info
+import androidx.compose.material.icons.twotone.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,13 +43,23 @@ import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.DpOffset
 import androidx.lifecycle.AndroidViewModel
 import com.beraldo.playerlib.PlayerService
+import com.mabnets.jslradio.components.*
 
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+@ExperimentalAnimationApi
 @Composable()
 fun MainScreen(navController: NavController) {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
     val scrollState = rememberScrollState()
+
+
 
 
     Column(
@@ -98,35 +111,73 @@ fun MainScreen(navController: NavController) {
 
 }
 
-
+@ExperimentalAnimationApi
 @Composable
 fun TopAppBar(navController: NavController) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        IconButton(onClick = { navController.navigateUp() }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back Icon",
-                tint = Color.White
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add list",
-                tint = Color.White
-            )
-        }
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More Icon",
-                tint = Color.White
-            )
+    val activity = (LocalContext.current as? Activity)
+    val snackbarHostState = remember { SnackbarHostState() }
+    val channel = remember { Channel<String>(Channel.CONFLATED) }
+    val (isOpen, setIsOpen) = remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = channel) {
+        channel.receiveAsFlow().collect {
+            snackbarHostState.showSnackbar(it)
         }
     }
+    Scaffold( scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            IconButton(onClick = {   activity?.finish() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back Icon",
+                    tint = Color.White
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add list",
+                    tint = Color.White
+                )
+            }
+            IconButton(onClick = {
+                setIsOpen(true)
+            }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More Icon",
+                    tint = Color.White
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .wrapContentSize(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.End
+            ) {
+                Spacer(modifier = Modifier.height(48.dp))
+                Box(
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    Menu(
+                        setIsOpen = setIsOpen,
+                        itemSelected = {
+                            channel.trySend(it)
+                            setIsOpen(false)
+                        },
+                        isOpen = isOpen
+                    )
+                }
+            }
+
+
+        }
+    }
+
 }
 
 @Composable
@@ -248,13 +299,14 @@ fun PlayerButtons(
 
 @Composable
 fun Otherbtns(navController: NavController) {
-    val ggle="www.google.com"
+    val allotherlinks=URLEncoder.encode("https://repentanceandholinessinfo.com/playradio.php", StandardCharsets.UTF_8.toString())
+    val alltime=URLEncoder.encode("http://node-15.zeno.fm/gmdx1sb97f8uv?rj-ttl=5&rj-tok=AAABfccRdpIA8mopC5CghSrEoA", StandardCharsets.UTF_8.toString())
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
         Button(
-            onClick = { navController.navigate("webviews/$ggle") },
+            onClick = { navController.navigate("webviews/$allotherlinks") },
             shape = RoundedCornerShape(10.dp),
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 6.dp,
@@ -271,7 +323,7 @@ fun Otherbtns(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(30.dp))
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {  navController.navigate("webviews/$alltime")},
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(1f),
             colors = ButtonDefaults.buttonColors(
@@ -287,4 +339,54 @@ fun Otherbtns(navController: NavController) {
 
         }
     }
+}
+fun getMenu(): CascadeMenuItem<String> {
+    return cascadeMenu {
+        item("share", "About") {
+            icon(Icons.TwoTone.Share)
+        }
+   /*  item("share", "Share") {
+            icon(Icons.TwoTone.Share)
+            item("to_clipboard", "To Clipboard") {
+                item("pdf", "PDF")
+                item("epub", "EPUB")
+                item("web page", "Web Page")
+                item("microsoft word", "Microsoft Word")
+            }
+            item("as a file", "As a file") {
+                item("pdf", "PDF")
+                item("epub", "EPUB")
+                item("web page", "Web Page")
+                item("microsoft word", "Microsoft Word")
+            }
+        }*/
+        /*item("remove", "Remove") {
+            icon(Icons.TwoTone.DeleteSweep)
+            item("Yep", "Yep") {
+                icon(Icons.TwoTone.Done)
+            }
+            item("Go Back", "Go Back") {
+                icon(Icons.TwoTone.Close)
+            }
+        }*/
+    }
+
+
+}
+
+@ExperimentalAnimationApi
+@Composable
+fun Menu(
+    isOpen: Boolean = false,
+    setIsOpen: (Boolean) -> Unit,
+    itemSelected: (String) -> Unit
+) {
+    val menu = getMenu()
+    CascadeMenu(
+        isOpen = isOpen,
+        menu = menu,
+        onItemSelected = itemSelected,
+        onDismiss = { setIsOpen(false) },
+        offset = DpOffset(8.dp, 0.dp)
+    )
 }

@@ -135,7 +135,7 @@ fun Webviewscreen(urls:String){
              false
          })
 
-         it.loadUrl("https://"+urls)
+         it.loadUrl(urls)
 
      })
        if (visibility.value){

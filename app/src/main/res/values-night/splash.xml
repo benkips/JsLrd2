@@ -3,7 +3,7 @@
 
     <style name="Theme.App.starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#ffffff</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launchertwo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splashlogo</item>
         <item name="postSplashScreenTheme">@style/Theme.JesusisLORD</item>
         <!--<item name="windowSplashScreenAnimationDuration">3000</item>-->
     </style>
