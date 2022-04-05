@@ -5,55 +5,44 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.ColorFilter
 import android.os.IBinder
 import android.widget.Toast
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mabnets.jslradio.R
-import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
-
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.twotone.Info
-import androidx.compose.material.icons.twotone.Share
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.DpOffset
-import androidx.lifecycle.AndroidViewModel
 import com.beraldo.playerlib.PlayerService
-import com.mabnets.jslradio.components.*
-
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
+import com.mabnets.jslradio.R
+import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-@ExperimentalAnimationApi
+
 @Composable()
 fun MainScreen(navController: NavController) {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
@@ -74,9 +63,9 @@ fun MainScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(horizontal = 10.dp)
+
     ) {
-        TopAppBar(navController)
+        TopAppbar(navController,musicviewmodel)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 10.dp)
@@ -111,23 +100,24 @@ fun MainScreen(navController: NavController) {
 
 }
 
-@ExperimentalAnimationApi
 @Composable
-fun TopAppBar(navController: NavController) {
+fun TopAppbar(navController: NavController,viewModel: Mediaplayerviewmodel) {
     val activity = (LocalContext.current as? Activity)
-    val snackbarHostState = remember { SnackbarHostState() }
-    val channel = remember { Channel<String>(Channel.CONFLATED) }
-    val (isOpen, setIsOpen) = remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
-    LaunchedEffect(key1 = channel) {
-        channel.receiveAsFlow().collect {
-            snackbarHostState.showSnackbar(it)
-        }
-    }
-    Scaffold( scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
+    TopAppBar(
+        backgroundColor= Color.Transparent,
+        modifier =Modifier
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        viewModel.getsecondcolor(),
+                        viewModel.getfirstcolor(),
+                    )
+                )
+            ) ,
+        navigationIcon = {
             IconButton(onClick = {   activity?.finish() }) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
@@ -135,48 +125,42 @@ fun TopAppBar(navController: NavController) {
                     tint = Color.White
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add list",
-                    tint = Color.White
-                )
-            }
+        },
+        title = { Text("Jesus is lord Radio",color = Color.White) },
+        actions = {
+
+
             IconButton(onClick = {
-                setIsOpen(true)
+                showMenu = !showMenu
             }) {
                 Icon(
                     imageVector = Icons.Default.MoreVert,
                     contentDescription = "More Icon",
                     tint = Color.White
                 )
+
             }
 
-            Column(
-                modifier = Modifier
-                    .wrapContentSize(),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.End
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
             ) {
-                Spacer(modifier = Modifier.height(48.dp))
-                Box(
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    Menu(
-                        setIsOpen = setIsOpen,
-                        itemSelected = {
-                            channel.trySend(it)
-                            setIsOpen(false)
-                        },
-                        isOpen = isOpen
-                    )
+
+                DropdownMenuItem(onClick = { Toast.makeText(context, "Settings", Toast.LENGTH_SHORT).show() }) {
+                    Text(text = "Settings")
                 }
+
+                DropdownMenuItem(onClick = { Toast.makeText(context, "Logout", Toast.LENGTH_SHORT).show() }) {
+                    Text(text = "Logout")
+                }
+
             }
 
 
         }
-    }
+    )
+
+
 
 }
 
@@ -305,6 +289,7 @@ fun Otherbtns(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+
         Button(
             onClick = { navController.navigate("webviews/$allotherlinks") },
             shape = RoundedCornerShape(10.dp),
@@ -340,53 +325,4 @@ fun Otherbtns(navController: NavController) {
         }
     }
 }
-fun getMenu(): CascadeMenuItem<String> {
-    return cascadeMenu {
-        item("share", "About") {
-            icon(Icons.TwoTone.Share)
-        }
-   /*  item("share", "Share") {
-            icon(Icons.TwoTone.Share)
-            item("to_clipboard", "To Clipboard") {
-                item("pdf", "PDF")
-                item("epub", "EPUB")
-                item("web page", "Web Page")
-                item("microsoft word", "Microsoft Word")
-            }
-            item("as a file", "As a file") {
-                item("pdf", "PDF")
-                item("epub", "EPUB")
-                item("web page", "Web Page")
-                item("microsoft word", "Microsoft Word")
-            }
-        }*/
-        /*item("remove", "Remove") {
-            icon(Icons.TwoTone.DeleteSweep)
-            item("Yep", "Yep") {
-                icon(Icons.TwoTone.Done)
-            }
-            item("Go Back", "Go Back") {
-                icon(Icons.TwoTone.Close)
-            }
-        }*/
-    }
 
-
-}
-
-@ExperimentalAnimationApi
-@Composable
-fun Menu(
-    isOpen: Boolean = false,
-    setIsOpen: (Boolean) -> Unit,
-    itemSelected: (String) -> Unit
-) {
-    val menu = getMenu()
-    CascadeMenu(
-        isOpen = isOpen,
-        menu = menu,
-        onItemSelected = itemSelected,
-        onDismiss = { setIsOpen(false) },
-        offset = DpOffset(8.dp, 0.dp)
-    )
-}
