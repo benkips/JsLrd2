@@ -146,13 +146,22 @@ fun TopAppbar(navController: NavController,viewModel: Mediaplayerviewmodel) {
                 onDismissRequest = { showMenu = false }
             ) {
 
-                DropdownMenuItem(onClick = { Toast.makeText(context, "Settings", Toast.LENGTH_SHORT).show() }) {
+                DropdownMenuItem(onClick = {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SEND
+                    sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        "JESUS is LORD radio android app on playstore\n https://play.google.com/store/apps/details?id=com.mabnets.jslradio"
+                    )
+                    sendIntent.type = "text/plain"
+                    (context as Activity).startActivity(sendIntent)
+                }) {
                     Text(text = "Settings")
                 }
 
-                DropdownMenuItem(onClick = { Toast.makeText(context, "Logout", Toast.LENGTH_SHORT).show() }) {
+                /*DropdownMenuItem(onClick = { Toast.makeText(context, "Logout", Toast.LENGTH_SHORT).show() }) {
                     Text(text = "Logout")
-                }
+                }*/
 
             }
 
@@ -325,4 +334,5 @@ fun Otherbtns(navController: NavController) {
         }
     }
 }
+
 

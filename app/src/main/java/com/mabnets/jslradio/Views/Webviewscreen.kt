@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import android.app.Activity
 import android.webkit.*
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.annotation.RequiresApi
 import androidx.compose.material.TextButton
 import androidx.compose.ui.platform.LocalContext
 
@@ -79,12 +80,24 @@ fun Webviewscreen(urls:String){
                      super.onPageFinished(view, url)
                  }
 
+                 @RequiresApi(Build.VERSION_CODES.M)
                  override fun onReceivedError(
                      view: WebView?,
                      request: WebResourceRequest?,
                      error: WebResourceError?
                  ) {
-                     super.onReceivedError(view, request, error)
+                    // super.onReceivedError(view, request, error)
+
+                     try {
+                         visibility.value=false
+                     } catch (exception: Exception) {
+                         exception.printStackTrace()
+                     }
+                     if(error!!.errorCode==404) {
+                         val myerrorpage = "file:///android_asset/android/errorpage.html";
+                         view!!.loadUrl(myerrorpage)
+                     }
+
                  }
              }
 
@@ -127,6 +140,8 @@ fun Webviewscreen(urls:String){
          }
      }, update = {
          it.settings.javaScriptEnabled=true
+         it.webChromeClient=WebChromeClient()
+         it.webViewClient=WebViewClient()
          it.setOnKeyListener(View.OnKeyListener { v, keyCode, event ->
              if (keyCode == KeyEvent.KEYCODE_BACK && event.action == MotionEvent.ACTION_UP && it.canGoBack()) {
                  it.goBack()
