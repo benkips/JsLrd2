@@ -23,6 +23,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.annotation.RequiresApi
 import androidx.compose.material.TextButton
 import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.delay
 
 @Composable
 fun Webviewscreen(urls:String){
@@ -63,6 +64,7 @@ fun Webviewscreen(urls:String){
                  override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                      try {
                          visibility.value=true
+
                      } catch (exception: Exception) {
                          exception.printStackTrace()
                      }

@@ -108,15 +108,6 @@ fun TopAppbar(navController: NavController,viewModel: Mediaplayerviewmodel) {
 
     TopAppBar(
         backgroundColor= Color.Transparent,
-        modifier =Modifier
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        viewModel.getsecondcolor(),
-                        viewModel.getfirstcolor(),
-                    )
-                )
-            ) ,
         navigationIcon = {
             IconButton(onClick = {   activity?.finish() }) {
                 Icon(
