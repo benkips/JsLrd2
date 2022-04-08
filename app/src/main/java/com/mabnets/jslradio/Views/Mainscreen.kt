@@ -5,48 +5,50 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.graphics.ColorFilter
 import android.os.IBinder
 import android.widget.Toast
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mabnets.jslradio.R
-import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
-
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.AndroidViewModel
 import com.beraldo.playerlib.PlayerService
+import com.mabnets.jslradio.R
+import com.mabnets.jslradio.Viewmodels.Mediaplayerviewmodel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable()
 fun MainScreen(navController: NavController) {
     val musicviewmodel: Mediaplayerviewmodel = viewModel()
     val scrollState = rememberScrollState()
+
+
 
 
     Column(
@@ -61,9 +63,9 @@ fun MainScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(horizontal = 10.dp)
+
     ) {
-        TopAppBar(navController)
+        TopAppbar(navController,musicviewmodel)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 10.dp)
@@ -98,35 +100,77 @@ fun MainScreen(navController: NavController) {
 
 }
 
-
 @Composable
-fun TopAppBar(navController: NavController) {
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        IconButton(onClick = { navController.navigateUp() }) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back Icon",
-                tint = Color.White
-            )
+fun TopAppbar(navController: NavController,viewModel: Mediaplayerviewmodel) {
+    val activity = (LocalContext.current as? Activity)
+    var showMenu by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    TopAppBar(
+        backgroundColor= Color.Transparent,
+        modifier =Modifier
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        viewModel.getsecondcolor(),
+                        viewModel.getfirstcolor(),
+                    )
+                )
+            ) ,
+        navigationIcon = {
+            IconButton(onClick = {   activity?.finish() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back Icon",
+                    tint = Color.White
+                )
+            }
+        },
+        title = { Text("Jesus is lord Radio",color = Color.White) },
+        actions = {
+
+
+            IconButton(onClick = {
+                showMenu = !showMenu
+            }) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More Icon",
+                    tint = Color.White
+                )
+
+            }
+
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+
+                DropdownMenuItem(onClick = {
+                    val sendIntent = Intent()
+                    sendIntent.action = Intent.ACTION_SEND
+                    sendIntent.putExtra(
+                        Intent.EXTRA_TEXT,
+                        "JESUS is LORD radio android app on playstore\n https://play.google.com/store/apps/details?id=com.mabnets.jslradio"
+                    )
+                    sendIntent.type = "text/plain"
+                    (context as Activity).startActivity(sendIntent)
+                }) {
+                    Text(text = "Settings")
+                }
+
+                /*DropdownMenuItem(onClick = { Toast.makeText(context, "Logout", Toast.LENGTH_SHORT).show() }) {
+                    Text(text = "Logout")
+                }*/
+
+            }
+
+
         }
-        Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add list",
-                tint = Color.White
-            )
-        }
-        IconButton(onClick = { /*TODO*/ }) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More Icon",
-                tint = Color.White
-            )
-        }
-    }
+    )
+
+
+
 }
 
 @Composable
@@ -248,13 +292,15 @@ fun PlayerButtons(
 
 @Composable
 fun Otherbtns(navController: NavController) {
-    val ggle="www.google.com"
+    val allotherlinks=URLEncoder.encode("https://repentanceandholinessinfo.com/playradio.php", StandardCharsets.UTF_8.toString())
+    val alltime=URLEncoder.encode("http://node-15.zeno.fm/gmdx1sb97f8uv?rj-ttl=5&rj-tok=AAABfccRdpIA8mopC5CghSrEoA", StandardCharsets.UTF_8.toString())
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+
         Button(
-            onClick = { navController.navigate("webviews/$ggle") },
+            onClick = { navController.navigate("webviews/$allotherlinks") },
             shape = RoundedCornerShape(10.dp),
             elevation = ButtonDefaults.elevation(
                 defaultElevation = 6.dp,
@@ -271,7 +317,7 @@ fun Otherbtns(navController: NavController) {
         }
         Spacer(modifier = Modifier.height(30.dp))
         Button(
-            onClick = { /*TODO*/ },
+            onClick = {  navController.navigate("webviews/$alltime")},
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth(1f),
             colors = ButtonDefaults.buttonColors(
@@ -288,3 +334,5 @@ fun Otherbtns(navController: NavController) {
         }
     }
 }
+
+

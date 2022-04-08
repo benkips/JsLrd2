@@ -110,9 +110,12 @@ class PlayerHolder(
                 info { "playerStateChanged: ${getStateString(playbackState)}, $playWhenReady" }
             }
 
-            override fun onPlayerError(error: ExoPlaybackException?) {
+            override fun onPlayerError(error: ExoPlaybackException) {
                 info { "playerError: $error" }
             }
+            /*fun onPlayerError(error: ExoPlaybackException?) {
+
+            }*/
 
             fun getStateString(state: Int): String {
                 return when (state) {

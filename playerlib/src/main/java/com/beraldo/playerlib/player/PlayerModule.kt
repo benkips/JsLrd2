@@ -17,6 +17,7 @@
 package com.beraldo.playerlib.player
 
 import android.content.Context
+import androidx.core.app.NotificationCompat
 import com.beraldo.playerlib.PlayerService
 import com.beraldo.playerlib.R
 import com.beraldo.playerlib.media.DescriptionAdapter
@@ -40,10 +41,11 @@ object PlayerModule {
             getDescriptionAdapter(context)
         ).apply {
             setFastForwardIncrementMs(0)
-            setOngoing(true)
+            //setOngoing(true)
             setUseNavigationActions(false)
             setRewindIncrementMs(0)
-            setStopAction(null)
+            setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+            //setStopAction(null)
         }
 
     private fun getDescriptionAdapter(context: Context) = DescriptionAdapter(context)

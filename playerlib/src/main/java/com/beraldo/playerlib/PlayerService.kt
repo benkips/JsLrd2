@@ -73,6 +73,10 @@ class PlayerService : IntentService("playerlib"), PlayerNotificationManager.Noti
         }
     }
 
+    override fun onNotificationStarted(notificationId: Int, notification: Notification) {
+        startForeground(notificationId, notification)
+    }
+
     /** NotificationListener callbacks, we get these calls when our [playerNotificationManager]
      * dispatches them, subsequently to our [PlayerNotificationManager.setPlayer] call.
      *
@@ -81,9 +85,9 @@ class PlayerService : IntentService("playerlib"), PlayerNotificationManager.Noti
      */
     override fun onNotificationCancelled(notificationId: Int) {}
 
-    override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
+    /*override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
         startForeground(notificationId, notification)
-    }
+    }*/
 
     inner class PlayerServiceBinder : Binder() {
         fun getPlayerHolderInstance() = playerHolder
