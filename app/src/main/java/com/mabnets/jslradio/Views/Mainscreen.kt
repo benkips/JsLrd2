@@ -7,13 +7,10 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -53,7 +50,7 @@ fun MainScreen(navController: NavController) {
 
     Column(
         modifier = Modifier
-            .scrollable(scrollState, Orientation.Vertical)
+            .scrollable(scrollState, Orientation.Vertical,true)
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
@@ -77,7 +74,7 @@ fun MainScreen(navController: NavController) {
                 contentDescription = "Image Banner",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .sizeIn(maxWidth = 500.dp, maxHeight = 500.dp)
+                    .sizeIn(maxWidth = 200.dp, maxHeight = 200.dp)
                     .aspectRatio(1f)
                     .clip(RoundedCornerShape(10.dp))
                     .weight(10f)
